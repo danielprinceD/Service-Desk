@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ServiceDetailsPage extends StatefulWidget {
   const ServiceDetailsPage({super.key});
 
-  static const String routeName = '/customer/detailspage';
+  static const String routeName = '/service/detailspage';
 
 
   @override

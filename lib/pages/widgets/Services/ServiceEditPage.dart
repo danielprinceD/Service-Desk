@@ -12,6 +12,13 @@ class ServiceEditPage extends StatefulWidget {
 class _ServiceEditPageState extends State<ServiceEditPage> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: ,
+      ),
+      body: const Center(
+        child: Text('Service Edit Page Content Here'),
+      ),
+    )
   }
 }

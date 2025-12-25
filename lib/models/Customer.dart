@@ -18,6 +18,14 @@ class Customer{
     return map;
   }
 
+  factory Customer.fromMap(Map<String, dynamic> map){
+    return Customer(
+      customerId: map['CustomerId'],
+      customerName: map['CustomerName'],
+      mobilNumber: map['MobilNumber'],
+    );
+  }
+
   bool addorUpdateCustomer() {
     DBInitializer.instance.db.then((database) async {
       customerId == null ? 

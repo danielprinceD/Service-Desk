@@ -14,6 +14,13 @@ class Model {
     };
   }
 
+  factory Model.fromMap(Map<String, dynamic> map) {
+    return Model(
+      modelId: map['modelId'],
+      modelName: map['modelName'],
+    );
+  }
+
   bool addOrUpdateModel() {
     DBInitializer.instance.db.then((database) async {
       modelId == null

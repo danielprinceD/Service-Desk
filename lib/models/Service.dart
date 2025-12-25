@@ -34,6 +34,19 @@ class Service {
     };
   }
 
+  factory Service.fromMap(Map<String, dynamic> map) {
+    return Service(
+      serviceId: map['id'],
+      brandId: map['brandId'],
+      modelId: map['modelId'],
+      IMEINumber: map['IMEINumber'],
+      customerID: map['customerID'],
+      amount: map['amount'],
+      deliveryStatus: map['deliveryStatus'],
+      date: map['date'],
+    );
+  }
+
   bool addOrUpdateService() {
     DBInitializer.instance.db.then((database) async {
       serviceId == null

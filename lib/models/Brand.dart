@@ -13,6 +13,13 @@ class Brand {
     };
   }
 
+  factory Brand.fromMap(Map<String, dynamic> map) {
+    return Brand(
+      brandId: map['brandId'],
+      brandName: map['brandName'],
+    );
+  }
+
   bool addOrUpdateBrand() {
     DBInitializer.instance.db.then((database) async {
       brandId == null

@@ -16,19 +16,19 @@ class Routeconfig{
     static Map<String , Widget Function(BuildContext)> all(BuildContext context){
       return {
         // Service 
-        ServiceListPage.routeName: (context) => const ServiceListPage(),
-        ServiceDetailsPage.routeName: (context) => const ServiceDetailsPage(),
-        ServiceEditPage.routeName: (context) => const ServiceEditPage(),
+        ServiceListPage.routeName: (context) =>  ServiceListPage(),
+        ServiceDetailsPage.routeName: (context) =>  ServiceDetailsPage(),
+        ServiceEditPage.routeName: (context) =>  ServiceEditPage(),
 
         // Customer 
-        CustomerListView.routeName: (context) => const CustomerListView(),
-        CustomerDetailsPage.routeName: (context) => const CustomerDetailsPage(),
-        CustomerEditPage.routeName: (context) => const CustomerEditPage(),
+        CustomerListView.routeName: (context) =>  CustomerListView(),
+        CustomerDetailsPage.routeName: (context) =>  CustomerDetailsPage(),
+        CustomerEditPage.routeName: (context) =>  CustomerEditPage(),
 
         // Transaction
-        TransactionListView.routeName: (context) => const TransactionListView(),
-        TransactionDetailsPage.routeName: (context) => const TransactionDetailsPage(),
-        TransactionEditPage.routeName: (context) => const TransactionEditPage(),
+        TransactionListView.routeName: (context) =>  TransactionListView(),
+        TransactionDetailsPage.routeName: (context) =>  TransactionDetailsPage(),
+        TransactionEditPage.routeName: (context) =>  TransactionEditPage(),
         
       };
     }

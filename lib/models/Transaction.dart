@@ -22,6 +22,17 @@ class Transaction {
     required this.date,
   });
 
+  factory Transaction.fromMap(Map<String, dynamic> map) {
+    return Transaction(
+      transactionId: map['transactionId'],
+      serviceId: map['serviceId'],
+      transactionDate: map['transactionDate'],
+      amount: map['amount'],
+      notes: map['notes'],
+      transactionType: TransactionType.values[map['transactionType']],
+      date: map['date'],
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
