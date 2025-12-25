@@ -54,7 +54,7 @@ class TableCreator {
       'ServiceId': 'INTEGER References ServiceTable(ServiceId)',
       'Amount': 'REAL',
       'Note': 'TEXT',
-      'PaymentType': 'TEXT',
+      'PaymentType': 'BOOLEAN',
       'Date': 'TEXT',
     }) 
     + addConstraint('fk_transaction_service', 'ServiceId', 'ServiceTable', 'ServiceId', 'RESTRICT');

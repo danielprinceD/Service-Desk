@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import './table_creator.dart';
 class DBInitializer {
   static const String dbName = 'service_desk.db';
-  static final DBInitializer dbInitializer = DBInitializer._instance();
+  static final DBInitializer instance = DBInitializer._instance();
   DBInitializer._instance();
 
   static Database? database;
