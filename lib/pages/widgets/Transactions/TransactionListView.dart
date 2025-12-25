@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class TransactionListView extends StatefulWidget {
   const TransactionListView({super.key});
 
+  static const String routeName = '/transaction/list';  
+
   @override
   State<TransactionListView> createState() => _TransactionListViewState();
 }

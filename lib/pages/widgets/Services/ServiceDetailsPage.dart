@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class ServiceDetailsPage extends StatefulWidget {
   const ServiceDetailsPage({super.key});
 
+  static const String routeName = '/customer/detailspage';
+
+
   @override
   State<ServiceDetailsPage> createState() => _ServiceDetailsPageState();
 }

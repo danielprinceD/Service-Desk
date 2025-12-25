@@ -45,4 +45,13 @@ class Service {
     return false;
   }
 
+   static List<Map<String, dynamic>> getAllServices() {
+    DBInitializer.instance.db.then((database) async {
+      List<Map<String, dynamic>> maps =
+          await database.query('ServiceTable');
+      return maps;
+    });
+    return [];
+  }
+
 }

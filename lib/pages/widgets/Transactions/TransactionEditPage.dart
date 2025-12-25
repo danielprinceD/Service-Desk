@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class TransactionEditPage extends StatefulWidget {
   const TransactionEditPage({super.key});
 
+  static const String routeName = '/transaction/editpage';
+
   @override
   State<TransactionEditPage> createState() => _TransactionEditPageState();
 }

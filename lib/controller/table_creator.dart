@@ -1,5 +1,3 @@
-
-
 class TableCreator {
    static String _createTable(String tableName, Map<String, String> columns) {
       String columnsDefinition = columns.entries

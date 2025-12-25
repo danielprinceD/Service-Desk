@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class ServiceEditPage extends StatefulWidget {
   const ServiceEditPage({super.key});
 
+  static const String routeName = '/service/editpage';
+
   @override
   State<ServiceEditPage> createState() => _ServiceEditPageState();
 }

@@ -1,11 +1,12 @@
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import './table_creator.dart';
 class DBInitializer {
   static const String dbName = 'service_desk.db';
   static final DBInitializer instance = DBInitializer._instance();
-  DBInitializer._instance();
-
   static Database? database;
+
+  DBInitializer._instance();
 
   Future<Database> get db async {
     database ??= await initializeDB();
@@ -21,12 +22,17 @@ class DBInitializer {
   }
 
   Future<Database> initializeDB() async {
-    String path = await getDatabasesPath() + dbName;
+    String path = await getDatabasesPath();
+    String dbPath = join(path, dbName);
+    print( """\n\n\n 
+                        Database Location : " + $dbPath + 
+          "\n\n\n
+    """);
     return await openDatabase(
-      path,
+      dbPath,
       version: 1,
-      onCreate: (db, version) async {
-        await createTables(db, version);
+      onCreate: (newdb, verSion) async {
+        await createTables(newdb, verSion);
       },
     );
   }
