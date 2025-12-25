@@ -30,7 +30,7 @@ class Service {
       'brandId': brand.brandId,
       'modelId': model.modelId,
       'IMEINumber': IMEINumber,
-      'customerId': customer.customerId ,
+      'customerId': customer.customerId,
       'amount': amount,
       'deliveryStatus': deliveryStatus,
       'date': date,
@@ -53,20 +53,21 @@ class Service {
   int? addOrUpdateService() {
     DBInitializer.instance.db.then((database) async {
 
-      if(model.modelId == null){
-        int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
-        model.modelId = newModelId;
-        if(newModelId == null){
-          return null;
-        }
-      }
-      if(brand.brandId == null){
-        int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
-        brand.brandId = newBrandId;
-        if(newBrandId == null){
-          return null;
-        }
-      }
+      // if(model.modelId == null){
+      //   int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
+      //   model.modelId = newModelId;
+      //   if(newModelId == null){
+      //     return null;
+      //   }
+      // }
+
+      // if(brand.brandId == null){
+      //   int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
+      //   brand.brandId = newBrandId;
+      //   if(newBrandId == null){
+      //     return null;
+      //   }
+      // }
 
       if(customer.customerId == null){
         int? newCustomerId = Customer(customerName: customer.customerName, mobilNumber: customer.mobilNumber).addorUpdateCustomer();
@@ -76,11 +77,11 @@ class Service {
         }
       }
 
-      int? result = serviceId == null
-          ? await database.insert('ServiceTable', toMap())
-          : await database.update('ServiceTable', toMap(),
-              where: 'ServiceId = ?', whereArgs: [serviceId]);
-      return result;
+      // int? result = serviceId == null
+      //     ? await database.insert('ServiceTable', toMap())
+      //     : await database.update('ServiceTable', toMap(),
+      //         where: 'ServiceId = ?', whereArgs: [serviceId]);
+      // return result;
     });
     return null;
   }

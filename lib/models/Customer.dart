@@ -37,7 +37,7 @@ class Customer{
     return null;
   }
 
-  static List getAllModel(){
+  static List getAllCustomer(){
      DBInitializer.instance.db.then((database) async {
       List models = await database.query('CustomerTable');
         return models.isNotEmpty ? models : [];

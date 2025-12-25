@@ -18,15 +18,31 @@ class ServiceEditPage extends StatefulWidget {
 class _ServiceEditPageState extends State<ServiceEditPage> {
 
   Service? service;
-  final List _brands = Brand.getAllBrand();
-  final List _models = Model.getAllModel();
-  final List _customers = Customer.getAllModel();
+  List? _brands;
+  List? _models;
+  
+  List? _customers;
+
+  Future<void> initVariables()async{
+    List modelResult = await Model.getAllModel();
+    _customers = Customer.getAllCustomer();
+    _brands = Brand.getAllBrand();
+    setState(() {
+      _models = modelResult;
+      _brands = _brands;
+    });
+    
+  }
 
   @override
   void initState() {
     super.initState();
     if(widget.serviceId == null){
-      service = Service(brand: Brand(brandName: ''), model: Model(modelName: ''), IMEINumber: '', customer: Customer(customerName:'' , mobilNumber: ''), deliveryStatus: '', date: '');
+
+      initVariables();
+
+      service = Service(brand: Brand(brandName: ''), model: Model(modelName: ''), IMEINumber: '', customer: Customer(customerName:'' , mobilNumber: ''), deliveryStatus: '', date: DateTime.now().toString().split(' ')[0].replaceAll( '-', '/'));
+
     }
     else {
       Map<String , dynamic> result = Service.getServiceById(widget.serviceId);
@@ -37,12 +53,31 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    GlobalKey<FormState> formKey = GlobalKey();
+
+    void _onSubmit(){
+      if(!formKey.currentState!.validate()){
+        return;
+      }
+      print(service?.toMap());
+      service?.addOrUpdateService();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Service Added Successfully"))
+      );
+    }
+
+
     return Scaffold(
       appBar: AppBar(
         title: widget.serviceId != null ? const Text('Edit Service') : const Text('Add Service'),
       ),
       body: Form(
-          child: ServiceFields.getServiceFields( service , widget ,  _brands , _models , _customers , ElevatedButton(onPressed: ()=>{}, child: Container(child: Text('Submit')) ) 
+          key: formKey ,
+          child: ServiceFields.getServiceFields( service , widget ,  _brands , _models , _customers , 
+            ElevatedButton(onPressed: _onSubmit , 
+              child: Container(child: Text('Submit')) 
+            ) 
         )        
       )
     );

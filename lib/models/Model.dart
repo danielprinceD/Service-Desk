@@ -1,5 +1,6 @@
 
 import 'package:service_desk/controller/db_initializer.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Model {
   int? modelId;
@@ -16,8 +17,8 @@ class Model {
 
   factory Model.fromMap(Map<String, dynamic> map) {
     return Model(
-      modelId: map['modelId'],
-      modelName: map['modelName'],
+      modelId: map['ModelId'],
+      modelName: map['ModelName'],
     );
   }
 
@@ -32,12 +33,10 @@ class Model {
     return null;
   }
 
-   static List getAllModel(){
-     DBInitializer.instance.db.then((database) async {
-      List models = await database.query('ModelTable');
-        return models.isNotEmpty ? models : [];
-     });
-     return [];
+   static Future<List> getAllModel() async {
+     Database db = await DBInitializer.instance.db;
+      List models = await db.query('ModelTable');
+      return models ?? [];
   }
 
 }

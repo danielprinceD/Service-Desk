@@ -15,8 +15,8 @@ class Brand {
 
   factory Brand.fromMap(Map<String, dynamic> map) {
     return Brand(
-      brandId: map['brandId'],
-      brandName: map['brandName'],
+      brandId: map['BrandId'],
+      brandName: map['BrandName'],
     );
   }
 
