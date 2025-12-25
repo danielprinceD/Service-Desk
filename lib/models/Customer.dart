@@ -3,9 +3,9 @@
 import 'package:service_desk/controller/db_initializer.dart';
 
 class Customer{
-  final int? customerId;
-  final String customerName;
-  final String mobilNumber;
+  int? customerId;
+  String? customerName;
+  String? mobilNumber;
 
   Customer({this.customerId, required this.customerName, required this.mobilNumber});
 
@@ -26,15 +26,23 @@ class Customer{
     );
   }
 
-  bool addorUpdateCustomer() {
+  int? addorUpdateCustomer() {
     DBInitializer.instance.db.then((database) async {
-      customerId == null ? 
+      int newCustomerID = customerId == null ? 
         await database.insert('CustomerTable', toMap()) : 
         await database.update('CustomerTable', toMap(), 
           where: 'CustomerId = ?', whereArgs: [customerId]);
-      return true;
+      return newCustomerID;
     });
-    return false;
+    return null;
+  }
+
+  static List getAllModel(){
+     DBInitializer.instance.db.then((database) async {
+      List models = await database.query('CustomerTable');
+        return models.isNotEmpty ? models : [];
+     });
+     return [];
   }
 
 }

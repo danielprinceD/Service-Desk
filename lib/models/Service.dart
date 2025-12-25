@@ -1,21 +1,24 @@
 import 'package:service_desk/controller/db_initializer.dart';
+import 'package:service_desk/models/Brand.dart';
+import 'package:service_desk/models/Customer.dart';
+import 'package:service_desk/models/Model.dart';
 
 class Service {
-  final int? serviceId;
-  final int brandId;
-  final int modelId;
-  final String IMEINumber;
-  final String customerID;
-  final double amount;
-  final String deliveryStatus;
-  final String date;
+  int? serviceId;
+  Brand brand;
+  Model model;
+  String IMEINumber;
+  Customer customer;
+  double amount;
+  String deliveryStatus;
+  String date;
   
   Service({
     this.serviceId,
-    required this.brandId,
-    required this.modelId,
+    required this.brand,
+    required this.model,
     required this.IMEINumber,
-    required this.customerID,
+    required this.customer,
     this.amount = 0.0,
     required this.deliveryStatus,
     required this.date,
@@ -24,10 +27,10 @@ class Service {
   Map<String, dynamic> toMap() {
     return {
       'id': serviceId,
-      'brandId': brandId,
-      'modelId': modelId,
+      'brandId': brand.brandId,
+      'modelId': model.modelId,
       'IMEINumber': IMEINumber,
-      'customerID': customerID,
+      'customerId': customer.customerId ,
       'amount': amount,
       'deliveryStatus': deliveryStatus,
       'date': date,
@@ -37,25 +40,49 @@ class Service {
   factory Service.fromMap(Map<String, dynamic> map) {
     return Service(
       serviceId: map['id'],
-      brandId: map['brandId'],
-      modelId: map['modelId'],
+      brand: Brand(brandName: map['brandName'] , brandId: map['brandId']),
+      model: Model(modelName: map['modelName'] , modelId: map['modelId']),
       IMEINumber: map['IMEINumber'],
-      customerID: map['customerID'],
-      amount: map['amount'],
+      customer: Customer( customerId: map['customerID'] , customerName:  map['customerName'] , mobilNumber:  map['mobileNumber']),
+      amount: map['amount'] ,
       deliveryStatus: map['deliveryStatus'],
       date: map['date'],
     );
   }
 
-  bool addOrUpdateService() {
+  int? addOrUpdateService() {
     DBInitializer.instance.db.then((database) async {
-      serviceId == null
+
+      if(model.modelId == null){
+        int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
+        model.modelId = newModelId;
+        if(newModelId == null){
+          return null;
+        }
+      }
+      if(brand.brandId == null){
+        int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
+        brand.brandId = newBrandId;
+        if(newBrandId == null){
+          return null;
+        }
+      }
+
+      if(customer.customerId == null){
+        int? newCustomerId = Customer(customerName: customer.customerName, mobilNumber: customer.mobilNumber).addorUpdateCustomer();
+        customer.customerId = newCustomerId;
+        if(newCustomerId == null){
+          return null;
+        }
+      }
+
+      int? result = serviceId == null
           ? await database.insert('ServiceTable', toMap())
           : await database.update('ServiceTable', toMap(),
               where: 'ServiceId = ?', whereArgs: [serviceId]);
-      return true;
+      return result;
     });
-    return false;
+    return null;
   }
 
    static List<Map<String, dynamic>> getAllServices() {
@@ -65,6 +92,24 @@ class Service {
       return maps;
     });
     return [];
+  }
+
+  static Map<String , dynamic> getServiceById(int? id) {
+    DBInitializer.instance.db.then((database) async {
+      // with customerID join and brand and model
+      List<Map<String, dynamic>> maps = await database.rawQuery('''
+        SELECT S.*, C.CustomerName, B.brandName, M.modelName 
+        FROM ServiceTable S
+        JOIN CustomerTable C ON S.customerID = C.CustomerId
+        JOIN BrandTable B ON S.brandId = B.brandId
+        JOIN ModelTable M ON S.modelId = M.modelId
+        WHERE S.ServiceId = ?
+      ''', [id]);
+      if (maps.isNotEmpty) {
+        return maps.first;
+      }
+    });
+    return {};
   }
 
 }

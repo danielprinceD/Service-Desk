@@ -2,8 +2,8 @@
 import 'package:service_desk/controller/db_initializer.dart';
 
 class Model {
-  final int? modelId;
-  final String modelName;
+  int? modelId;
+  String modelName;
 
   Model({ this.modelId, required this.modelName});
 
@@ -21,14 +21,23 @@ class Model {
     );
   }
 
-  bool addOrUpdateModel() {
+  int? addOrUpdateModel() {
     DBInitializer.instance.db.then((database) async {
-      modelId == null
+      int newModelId = modelId == null
           ? await database.insert('ModelTable', toMap())
           : await database.update('ModelTable', toMap(),
               where: 'ModelId = ?', whereArgs: [modelId]);
-      return true;
+      return newModelId;
     });
-    return false;
+    return null;
   }
+
+   static List getAllModel(){
+     DBInitializer.instance.db.then((database) async {
+      List models = await database.query('ModelTable');
+        return models.isNotEmpty ? models : [];
+     });
+     return [];
+  }
+
 }

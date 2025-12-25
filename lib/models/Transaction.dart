@@ -5,13 +5,13 @@ import 'package:service_desk/controller/db_initializer.dart';
 enum TransactionType { credit , debit }
 
 class Transaction {
-  final int? transactionId;
-  final int serviceId;
-  final String transactionDate;
-  final double amount;
-  final String notes;
-  final TransactionType transactionType;
-  final String date;
+  int? transactionId;
+  int serviceId;
+  String transactionDate;
+  double amount;
+  String notes;
+  TransactionType transactionType;
+  String date;
   Transaction({
     this.transactionId,
     required this.serviceId,
