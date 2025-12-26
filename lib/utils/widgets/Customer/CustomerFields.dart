@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:service_desk/models/Customer.dart';
 import 'package:service_desk/models/Service.dart';
-import 'package:service_desk/pages/widgets/Customers/CustomerViewPage.dart';
 import 'package:service_desk/pages/widgets/Transactions/TransactionEditPage.dart';
 import 'package:service_desk/pages/widgets/Transactions/TransactionListView.dart';
 

@@ -39,7 +39,7 @@ class Model {
    static Future<List> getAllModel() async {
      Database db = await DBInitializer.instance.db;
       List models = await db.query('ModelTable');
-      return models ?? [];
+    return models ?? [];
   }
 
 }
