@@ -1,8 +1,6 @@
-
-
 import 'package:service_desk/controller/db_initializer.dart';
 
-enum TransactionType { credit , debit }
+enum TransactionType { credit, debit }
 
 class Transaction {
   int? transactionId;
@@ -50,12 +48,14 @@ class Transaction {
     DBInitializer.instance.db.then((database) async {
       transactionId == null
           ? await database.insert('TransactionTable', toMap())
-          : await database.update('TransactionTable', toMap(),
-              where: 'TransactionId = ?', whereArgs: [transactionId]);
+          : await database.update(
+              'TransactionTable',
+              toMap(),
+              where: 'TransactionId = ?',
+              whereArgs: [transactionId],
+            );
       return true;
     });
     return false;
   }
-  
-
 }

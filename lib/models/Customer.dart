@@ -6,15 +6,15 @@ import 'package:sqflite/sqflite.dart';
 class Customer{
   int? customerId;
   String? customerName;
-  String? mobilNumber;
+  String? mobileNumber;
 
-  Customer({this.customerId, required this.customerName, required this.mobilNumber});
+  Customer({this.customerId, required this.customerName, required this.mobileNumber});
 
   Map<String, dynamic> toMap(){
     var map = <String, dynamic>{
       'CustomerId': customerId,
       'CustomerName': customerName,
-      'MobilNumber': mobilNumber,
+      'MobileNumber': mobileNumber,
     };
     return map;
   }
@@ -23,19 +23,16 @@ class Customer{
     return Customer(
       customerId: map['CustomerId'],
       customerName: map['CustomerName'],
-      mobilNumber: map['MobilNumber'],
+      mobileNumber: map['MobileNumber'],
     );
   }
 
-  int? addorUpdateCustomer() {
-    DBInitializer.instance.db.then((database) async {
-      int newCustomerID = customerId == null ? 
-        await database.insert('CustomerTable', toMap()) : 
-        await database.update('CustomerTable', toMap(), 
+  Future<int?> addorUpdateCustomer(Transaction txn) async {
+    int newCustomerID = customerId == null ? 
+        await txn.insert('CustomerTable', toMap()) : 
+        await txn.update('CustomerTable', toMap(), 
           where: 'CustomerId = ?', whereArgs: [customerId]);
-      return newCustomerID;
-    });
-    return null;
+    return newCustomerID;
   }
 
   static Future<List> getAllCustomer() async {

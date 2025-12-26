@@ -21,16 +21,19 @@ class Brand {
     );
   }
 
-  int? addOrUpdateBrand() {
-    DBInitializer.instance.db.then((database) async {
-      int? result = brandId == null
-          ? await database.insert('BrandTable', toMap())
-          : await database.update('BrandTable', toMap(),
-              where: 'BrandId = ?', whereArgs: [brandId]);
-      return result;
-    });
-    return null;
-  }
+  Future<int?> addOrUpdateBrand(Transaction txn) async {
+  final int result = brandId == null
+      ? await txn.insert('BrandTable', toMap())
+      : await txn.update(
+          'BrandTable',
+          toMap(),
+          where: 'BrandId = ?',
+          whereArgs: [brandId],
+        );
+
+  return result;
+}
+
 
   static Future<List> getAllBrand() async {
       Database db = await DBInitializer.instance.db; 

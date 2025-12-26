@@ -22,16 +22,19 @@ class Model {
     );
   }
 
-  int? addOrUpdateModel() {
-    DBInitializer.instance.db.then((database) async {
-      int newModelId = modelId == null
-          ? await database.insert('ModelTable', toMap())
-          : await database.update('ModelTable', toMap(),
-              where: 'ModelId = ?', whereArgs: [modelId]);
-      return newModelId;
-    });
-    return null;
-  }
+  Future<int?> addOrUpdateModel(Transaction txn) async {
+  final int result = modelId == null
+      ? await txn.insert('ModelTable', toMap())
+      : await txn.update(
+          'ModelTable',
+          toMap(),
+          where: 'ModelId = ?',
+          whereArgs: [modelId],
+        );
+
+  return result;
+}
+
 
    static Future<List> getAllModel() async {
      Database db = await DBInitializer.instance.db;

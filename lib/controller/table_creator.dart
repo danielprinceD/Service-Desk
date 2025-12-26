@@ -11,7 +11,7 @@ class TableCreator {
     return _createTable('CustomerTable', {
       'CustomerId': 'INTEGER PRIMARY KEY AUTOINCREMENT',
       'CustomerName': 'TEXT',
-      'MobilNumber': 'TEXT',
+      'MobileNumber': 'TEXT',
     });
   }
 
@@ -32,8 +32,8 @@ class TableCreator {
   static String createServiceTable(){
     return _createTable('ServiceTable', {
       'ServiceId': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-      'brandId': 'INTEGER References BrandTable(BrandId)',
-      'modelId': 'INTEGER References ModelTable(ModelId)',
+      'BrandId': 'INTEGER References BrandTable(BrandId)',
+      'ModelId': 'INTEGER References ModelTable(ModelId)',
       'IMEINumber': 'TEXT',
       'CustomerId': 'INTEGER References CustomerTable(CustomerId)',
       'TotalAmount': 'REAL',

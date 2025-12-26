@@ -2,6 +2,7 @@ import 'package:service_desk/controller/db_initializer.dart';
 import 'package:service_desk/models/Brand.dart';
 import 'package:service_desk/models/Customer.dart';
 import 'package:service_desk/models/Model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Service {
   int? serviceId;
@@ -26,16 +27,18 @@ class Service {
 
   Map<String, dynamic> toMap() {
     return {
-      'serviceId': serviceId,
-      'brandId': brand.brandId,
-      'modelId': model.modelId,
+      'ServiceId': serviceId,
+      'BrandId': brand.brandId,
+      'ModelId': model.modelId,
       'IMEINumber': IMEINumber,
-      'customerId': customer.customerId,
+      'CustomerId': customer.customerId,
       'TotalAmount': totalAmount,
-      'deliveryStatus': deliveryStatus,
-      'date': date,
+      'DeliveryStatus': deliveryStatus,
+      'Date': date,
     };
   }
+
+  
 
   factory Service.fromMap(Map<String, dynamic> map) {
     return Service(
@@ -43,74 +46,99 @@ class Service {
       brand: Brand(brandName: map['BrandName'] , brandId: map['BrandId']),
       model: Model(modelName: map['ModelName'] , modelId: map['ModelId']),
       IMEINumber: map['IMEINumber'],
-      customer: Customer( customerId: map['CustomerID'] , customerName:  map['CustomerName'] , mobilNumber:  map['MobileNumber']),
-      totalAmount: map['TotalAmount'] ,
+      customer: Customer( customerId: map['CustomerID'] , customerName:  map['CustomerName'] , mobileNumber:  map['MobileNumber']),
+      totalAmount: double.tryParse(map['TotalAmount'].toString()) ?? 0.0 ,
       deliveryStatus: map['DeliveryStatus'],
       date: map['Date'],
     );
   }
 
-  int? addOrUpdateService() {
-    DBInitializer.instance.db.then((database) async {
+  Future<int?> addOrUpdateService() async {
+  final db = await DBInitializer.instance.db;
+  final result = await db.transaction((txn) async {
+    try {
+      if (model.modelId == null) {
+        final newModelId = await Model(
+          modelName: model.modelName,
+        ).addOrUpdateModel(txn);
 
-      if(model.modelId == null){
-        int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
+        if (newModelId == null) {
+          throw Exception('Model insert failed');
+        }
+
         model.modelId = newModelId;
-        if(newModelId == null){
-          return null;
-        }
-      }
-
-      if(brand.brandId == null){
-        int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
-        brand.brandId = newBrandId;
-        if(newBrandId == null){
-          return null;
-        }
-      }
-
-      if(customer.customerId == null){
-        int? newCustomerId = Customer(customerName: customer.customerName, mobilNumber: customer.mobilNumber).addorUpdateCustomer();
-        customer.customerId = newCustomerId;
-        if(newCustomerId == null){
-          return null;
-        }
       }
       
-      int? result = serviceId == null
-          ? await database.insert('ServiceTable', toMap())
-          : await database.update('ServiceTable', toMap(),
-              where: 'ServiceId = ?', whereArgs: [serviceId]);
+      // 2️⃣ Brand
+      if (brand.brandId == null) {
+        final newBrandId = await Brand(
+          brandName: brand.brandName,
+        ).addOrUpdateBrand(txn);
+
+        if (newBrandId == null) {
+          throw Exception('Brand insert failed');
+        }
+
+        brand.brandId = newBrandId;
+      }
+
+      // 3️⃣ Customer
+      if (customer.customerId == null) {
+        final newCustomerId = await Customer(
+          customerName: customer.customerName,
+          mobileNumber: customer.mobileNumber,
+        ).addorUpdateCustomer(txn);
+
+        if (newCustomerId == null) {
+          throw Exception('Customer insert failed');
+        }
+
+        customer.customerId = newCustomerId;
+      }
+      // 4️⃣ Service
+      final result = serviceId == null
+          ? await txn.insert('ServiceTable', toMap())
+          : await txn.update(
+              'ServiceTable',
+              toMap(),
+              where: 'ServiceId = ?',
+              whereArgs: [serviceId],
+            );
+
       return result;
-    });
-    return null;
-  }
+    } catch (e) {
+      rethrow;
+    }
+  });
+  return result;
+}
 
-   static List<Map<String, dynamic>> getAllServices() {
-    DBInitializer.instance.db.then((database) async {
+
+   static Future<List<Map<String, dynamic>>> getAllServices() async {
+    Database db = await DBInitializer.instance.db;
       List<Map<String, dynamic>> maps =
-          await database.query('ServiceTable');
-      return maps;
-    });
-    return [];
+          await db.rawQuery('''
+              SELECT S.*, C.CustomerName, B.BrandName, M.ModelName
+              FROM ServiceTable S
+              JOIN CustomerTable C ON S.CustomerID = C.CustomerId
+              JOIN BrandTable B ON S.BrandId = B.BrandId
+              JOIN ModelTable M ON S.ModelId = M.ModelId
+          ''');
+      return maps ?? [];
   }
 
-  static Map<String , dynamic> getServiceById(int? id) {
-    DBInitializer.instance.db.then((database) async {
+  static Future<Map<String , dynamic>> getServiceById(int? id) async {
+    Database db = await DBInitializer.instance.db;
       // with customerID join and brand and model
-      List<Map<String, dynamic>> maps = await database.rawQuery('''
-        SELECT S.*, C.CustomerName, B.brandName, M.modelName 
+      List<Map<String, dynamic>> maps = await db.rawQuery('''
+        SELECT S.*, C.CustomerName, B.BrandName, M.ModelName , C.MobileNumber
         FROM ServiceTable S
-        JOIN CustomerTable C ON S.customerID = C.CustomerId
-        JOIN BrandTable B ON S.brandId = B.brandId
-        JOIN ModelTable M ON S.modelId = M.modelId
+        JOIN CustomerTable C ON S.CustomerID = C.CustomerId
+        JOIN BrandTable B ON S.BrandId = B.BrandId
+        JOIN ModelTable M ON S.ModelId = M.ModelId
         WHERE S.ServiceId = ?
       ''', [id]);
-      if (maps.isNotEmpty) {
-        return maps.first;
-      }
-    });
-    return {};
+    return maps.first;
   }
 
 }

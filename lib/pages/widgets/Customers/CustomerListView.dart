@@ -12,6 +12,6 @@ class CustomerListView extends StatefulWidget {
 class _CustomerListViewState extends State<CustomerListView> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(body: Center(child: Text('Customer List')));
   }
 }

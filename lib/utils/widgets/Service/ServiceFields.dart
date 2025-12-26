@@ -177,13 +177,14 @@ class ServiceFields {
                       labelText: 'Mobile Number',
                       border: OutlineInputBorder(),
                     ),
+                    initialValue: service?.customer.mobileNumber,
                     keyboardType: TextInputType.numberWithOptions(),
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                     ],
                     maxLength: 10,
                     onChanged: (value){
-                      service?.customer.mobilNumber = value;
+                      service?.customer.mobileNumber = value;
                     },
                     validator: (value){
                       if(value == null || value.isEmpty ){
@@ -193,6 +194,7 @@ class ServiceFields {
                     },
                   ),
                   TextFormField(
+                    initialValue: service?.totalAmount.toString() ,
                     decoration: const InputDecoration(
                       labelText: 'Amount',
                       border: OutlineInputBorder(),

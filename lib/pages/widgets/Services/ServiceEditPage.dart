@@ -10,13 +10,13 @@ class ServiceEditPage extends StatefulWidget {
   
   final int? serviceId;
   static const String routeName = '/service/editpage';
-
+  
   @override
   State<ServiceEditPage> createState() => _ServiceEditPageState();
 }
 
 class _ServiceEditPageState extends State<ServiceEditPage> {
-
+  
   Service? service;
   List? _brands;
   List? _models;
@@ -32,24 +32,25 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
       _customers = customerResult;
       _brands = brandResult;
     });
+
+    if(widget.serviceId != null){
+      Map<String , dynamic> serviceList = await Service.getServiceById(widget.serviceId);
+      setState(() {
+        service = Service.fromMap(serviceList);
+      });
+    }
     
   }
 
   @override
   void initState() {
     super.initState();
-    if(widget.serviceId == null){
 
-      initVariables();
-
-      service = Service(brand: Brand(brandName: ''), model: Model(modelName: ''), IMEINumber: '', customer: Customer(customerName:'' , mobilNumber: ''), deliveryStatus: '', date: DateTime.now().toString().split(' ')[0].replaceAll( '-', '/'));
-
+    initVariables();
+    if(widget.serviceId == null) { 
+      service = Service(brand: Brand(brandName: ''), model: Model(modelName: ''), IMEINumber: '', customer: Customer(customerName:'' , mobileNumber: ''), deliveryStatus: '', date: DateTime.now().toString().split(' ')[0].replaceAll( '-', '/') , totalAmount: 0.0);
     }
-    else {
-      Map<String , dynamic> result = Service.getServiceById(widget.serviceId);
-      service = Service.fromMap(result);
-    }
-    
+
   }
 
   @override
@@ -57,15 +58,24 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
 
     GlobalKey<FormState> formKey = GlobalKey();
 
-    void _onSubmit(){
-      if(!formKey.currentState!.validate()){
-        return;
+    void onSubmit(context) async {
+      if (!formKey.currentState!.validate()) return;
+
+      try {
+        final result = await service?.addOrUpdateService();
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Service Added Successfully")),
+        );
+      } catch (err) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(err.toString())),
+        );
       }
-      print(service?.toMap());
-      service?.addOrUpdateService();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Service Added Successfully"))
-      );
+      
     }
 
 
@@ -75,11 +85,11 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
       ),
       body: Form(
           key: formKey ,
-          child: ServiceFields.getServiceFields( service , widget ,  _brands , _models , _customers , 
-            ElevatedButton(onPressed: _onSubmit , 
+          child: service != null ? ServiceFields.getServiceFields( service , widget ,  _brands , _models , _customers , 
+            ElevatedButton(onPressed: ()=>onSubmit(context) , 
               child: Container(child: Text('Submit')) 
             ) 
-        )        
+        ) : Text("No Data Found")        
       )
     );
   }
