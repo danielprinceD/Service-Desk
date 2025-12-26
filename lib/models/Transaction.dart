@@ -1,61 +1,73 @@
 import 'package:service_desk/controller/db_initializer.dart';
+import 'package:sqflite/sqflite.dart';
 
-enum TransactionType { credit, debit }
+enum PaymentType { credit, debit }
 
 class Transaction {
   int? transactionId;
   int serviceId;
-  String transactionDate;
   double amount;
-  String notes;
-  TransactionType transactionType;
+  String note;
+  PaymentType paymentType;
   String date;
   Transaction({
     this.transactionId,
     required this.serviceId,
-    required this.transactionDate,
     required this.amount,
-    required this.notes,
-    required this.transactionType,
+    required this.note,
+    required this.paymentType,
     required this.date,
   });
 
-  factory Transaction.fromMap(Map<String, dynamic> map) {
-    return Transaction(
-      transactionId: map['transactionId'],
-      serviceId: map['serviceId'],
-      transactionDate: map['transactionDate'],
-      amount: map['amount'],
-      notes: map['notes'],
-      transactionType: TransactionType.values[map['transactionType']],
-      date: map['date'],
-    );
+  static List<Transaction> fromMap(List<Map<String, dynamic>> transactionMaps) {
+    return transactionMaps
+        .map(
+          (map) => Transaction(
+            transactionId: map['TransactionId'],
+            serviceId: map['ServiceId'],
+            amount: map['Amount'],
+            note: map['Note'],
+            paymentType:
+                PaymentType.values[map['PaymentType'] == 1 ? 1 : 0],
+            date: map['Date'],
+          ),
+        )
+        .toList();
   }
 
   Map<String, dynamic> toMap() {
     return {
       'transactionId': transactionId,
       'serviceId': serviceId,
-      'transactionDate': transactionDate,
       'amount': amount,
-      'notes': notes,
-      'transactionType': transactionType.index,
+      'note': note,
+      'PaymentType': paymentType.index,
       'date': date,
     };
   }
 
-  bool addOrUpdateTransaction() {
-    DBInitializer.instance.db.then((database) async {
-      transactionId == null
-          ? await database.insert('TransactionTable', toMap())
-          : await database.update(
-              'TransactionTable',
-              toMap(),
-              where: 'TransactionId = ?',
-              whereArgs: [transactionId],
-            );
-      return true;
-    });
-    return false;
+  Future<int?> addOrUpdateTransaction() async {
+    Database db = await DBInitializer.instance.db;
+    int result = transactionId == null
+        ? await db.insert('TransactionTable', toMap())
+        : await db.update(
+            'TransactionTable',
+            toMap(),
+            where: 'TransactionId = ?',
+            whereArgs: [transactionId],
+          );
+    return result;
+  }
+
+  static Future<List<Map<String, dynamic>>> getTransactionsByServiceId(
+    int? serviceId,
+  ) async {
+    Database db = await DBInitializer.instance.db;
+    List<Map<String, dynamic>> transactions = await db.rawQuery(
+      ''' SELECT * FROM TransactionTable
+          WHERE ServiceId = ?''',
+      [serviceId],
+    );
+    return transactions;
   }
 }

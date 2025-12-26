@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:service_desk/pages/widgets/Customers/CustomerEditPage.dart';
+import 'package:service_desk/pages/widgets/Customers/CustomerViewPage.dart';
 import 'package:service_desk/pages/widgets/Services/ServiceEditPage.dart';
 import 'package:service_desk/utils/widgets/CustomFloatingActionButton.dart';
 import '../../../models/Service.dart' as Service;
