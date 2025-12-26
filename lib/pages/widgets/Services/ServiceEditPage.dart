@@ -25,11 +25,12 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
 
   Future<void> initVariables()async{
     List modelResult = await Model.getAllModel();
-    _customers = Customer.getAllCustomer();
-    _brands = Brand.getAllBrand();
+    List customerResult = await Customer.getAllCustomer();
+    List brandResult = await Brand.getAllBrand();
     setState(() {
       _models = modelResult;
-      _brands = _brands;
+      _customers = customerResult;
+      _brands = brandResult;
     });
     
   }

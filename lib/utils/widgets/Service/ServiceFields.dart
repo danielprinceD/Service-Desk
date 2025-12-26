@@ -46,6 +46,7 @@ class ServiceFields {
 
                           if (!exists && value.trim().isNotEmpty) {
                             service?.brand.brandName = value;
+                            service?.brand.brandId = null;
                           }
 
                         },
@@ -94,6 +95,7 @@ class ServiceFields {
 
                           if (!exists && value.trim().isNotEmpty) {
                             service?.model.modelName = value;
+                            service?.model.modelId = null;
                           }
 
                         },
@@ -114,8 +116,8 @@ class ServiceFields {
 
                     onChanged: (value) {
                       if (value != null) {
-                        service?.brand.brandName = value['ModelName'];
-                        service?.brand.brandId = value['ModelId'];
+                        service?.model.modelName = value['ModelName'];
+                        service?.model.modelId = value['ModelId'];
                       }
                     },
                   ),
@@ -125,11 +127,11 @@ class ServiceFields {
                     mode: Mode.custom,
 
                     items: (filter, cs) => customers?.map((customer)=>{
-                      'customerName' : customer['customerName'],
-                      'customerId' : customer['customerId']
+                      'CustomerName' : customer['CustomerName'],
+                      'CustomerId' : customer['CustomerId']
                     }).toList() ?? [],
 
-                    compareFn: (a, b) => a['customerId'] == b['customerId'],
+                    compareFn: (a, b) => a['CustomerId'] == b['CustomerId'],
 
                     popupProps: PopupProps.menu(
                       showSearchBox: true,
@@ -138,11 +140,12 @@ class ServiceFields {
                         onChanged: (value) {
                           
                           final exists = customers?.any((b) =>
-                              b['customerName'].toString().toLowerCase() ==
+                              b['CustomerName'].toString().toLowerCase() ==
                               value.toLowerCase()) ?? false;
 
                           if (!exists && value.trim().isNotEmpty) {
                             service?.customer.customerName = value;
+                            service?.customer.customerId = null;
                           }
 
                         },
@@ -152,7 +155,7 @@ class ServiceFields {
                       itemBuilder: (context, item, isDisabled, isSelected) {
                         return Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Text(item['customerName']),
+                          child: Text(item['CustomerName'] ?? ''),
                         );
                       },
                     ),
@@ -163,8 +166,8 @@ class ServiceFields {
 
                     onChanged: (value) {
                       if (value != null) {
-                        service?.brand.brandName = value['customerName'];
-                        service?.brand.brandId = value['customerId'];
+                        service?.customer.customerName = value['CustomerName'];
+                        service?.customer.customerId = value['CustomerId'];
                       }
                     },
                   )
@@ -205,7 +208,7 @@ class ServiceFields {
                         return "Amount Field cannot be empty";
                       }
                     },
-                    onChanged: (value)=>service?.amount = double.parse(value) ,
+                    onChanged: (value)=>service?.totalAmount = double.tryParse(value) ?? 0.0 ,
                   ),
                   TextFormField(
                     decoration:  const InputDecoration(

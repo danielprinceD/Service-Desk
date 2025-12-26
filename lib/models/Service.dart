@@ -9,7 +9,7 @@ class Service {
   Model model;
   String IMEINumber;
   Customer customer;
-  double amount;
+  double totalAmount;
   String deliveryStatus;
   String date;
   
@@ -19,19 +19,19 @@ class Service {
     required this.model,
     required this.IMEINumber,
     required this.customer,
-    this.amount = 0.0,
+    this.totalAmount = 0.0,
     required this.deliveryStatus,
     required this.date,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'id': serviceId,
+      'serviceId': serviceId,
       'brandId': brand.brandId,
       'modelId': model.modelId,
       'IMEINumber': IMEINumber,
       'customerId': customer.customerId,
-      'amount': amount,
+      'TotalAmount': totalAmount,
       'deliveryStatus': deliveryStatus,
       'date': date,
     };
@@ -39,35 +39,35 @@ class Service {
 
   factory Service.fromMap(Map<String, dynamic> map) {
     return Service(
-      serviceId: map['id'],
-      brand: Brand(brandName: map['brandName'] , brandId: map['brandId']),
-      model: Model(modelName: map['modelName'] , modelId: map['modelId']),
+      serviceId: map['ServiceId'],
+      brand: Brand(brandName: map['BrandName'] , brandId: map['BrandId']),
+      model: Model(modelName: map['ModelName'] , modelId: map['ModelId']),
       IMEINumber: map['IMEINumber'],
-      customer: Customer( customerId: map['customerID'] , customerName:  map['customerName'] , mobilNumber:  map['mobileNumber']),
-      amount: map['amount'] ,
-      deliveryStatus: map['deliveryStatus'],
-      date: map['date'],
+      customer: Customer( customerId: map['CustomerID'] , customerName:  map['CustomerName'] , mobilNumber:  map['MobileNumber']),
+      totalAmount: map['TotalAmount'] ,
+      deliveryStatus: map['DeliveryStatus'],
+      date: map['Date'],
     );
   }
 
   int? addOrUpdateService() {
     DBInitializer.instance.db.then((database) async {
 
-      // if(model.modelId == null){
-      //   int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
-      //   model.modelId = newModelId;
-      //   if(newModelId == null){
-      //     return null;
-      //   }
-      // }
+      if(model.modelId == null){
+        int? newModelId = Model(modelName: model.modelName).addOrUpdateModel();
+        model.modelId = newModelId;
+        if(newModelId == null){
+          return null;
+        }
+      }
 
-      // if(brand.brandId == null){
-      //   int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
-      //   brand.brandId = newBrandId;
-      //   if(newBrandId == null){
-      //     return null;
-      //   }
-      // }
+      if(brand.brandId == null){
+        int? newBrandId = Brand(brandName: brand.brandName).addOrUpdateBrand();
+        brand.brandId = newBrandId;
+        if(newBrandId == null){
+          return null;
+        }
+      }
 
       if(customer.customerId == null){
         int? newCustomerId = Customer(customerName: customer.customerName, mobilNumber: customer.mobilNumber).addorUpdateCustomer();
@@ -76,12 +76,12 @@ class Service {
           return null;
         }
       }
-
-      // int? result = serviceId == null
-      //     ? await database.insert('ServiceTable', toMap())
-      //     : await database.update('ServiceTable', toMap(),
-      //         where: 'ServiceId = ?', whereArgs: [serviceId]);
-      // return result;
+      
+      int? result = serviceId == null
+          ? await database.insert('ServiceTable', toMap())
+          : await database.update('ServiceTable', toMap(),
+              where: 'ServiceId = ?', whereArgs: [serviceId]);
+      return result;
     });
     return null;
   }

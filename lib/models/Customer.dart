@@ -1,6 +1,7 @@
 
 
 import 'package:service_desk/controller/db_initializer.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Customer{
   int? customerId;
@@ -37,12 +38,10 @@ class Customer{
     return null;
   }
 
-  static List getAllCustomer(){
-     DBInitializer.instance.db.then((database) async {
-      List models = await database.query('CustomerTable');
-        return models.isNotEmpty ? models : [];
-     });
-     return [];
+  static Future<List> getAllCustomer() async {
+    Database db = await DBInitializer.instance.db;
+    List models = await db.query('CustomerTable');
+    return models ?? [];
   }
 
 }
