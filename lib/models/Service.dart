@@ -13,7 +13,7 @@ class Service {
   double totalAmount;
   String deliveryStatus;
   String date;
-  
+
   Service({
     this.serviceId,
     required this.brand,
@@ -38,107 +38,109 @@ class Service {
     };
   }
 
-  
-
   factory Service.fromMap(Map<String, dynamic> map) {
     return Service(
       serviceId: map['ServiceId'],
-      brand: Brand(brandName: map['BrandName'] , brandId: map['BrandId']),
-      model: Model(modelName: map['ModelName'] , modelId: map['ModelId']),
+      brand: Brand(brandName: map['BrandName'], brandId: map['BrandId']),
+      model: Model(modelName: map['ModelName'], modelId: map['ModelId']),
       IMEINumber: map['IMEINumber'],
-      customer: Customer( customerId: map['CustomerID'] , customerName:  map['CustomerName'] , mobileNumber:  map['MobileNumber']),
-      totalAmount: double.tryParse(map['TotalAmount'].toString()) ?? 0.0 ,
+      customer: Customer(
+        customerId: map['CustomerId'],
+        customerName: map['CustomerName'],
+        mobileNumber: map['MobileNumber'],
+      ),
+      totalAmount: double.tryParse(map['TotalAmount'].toString()) ?? 0.0,
       deliveryStatus: map['DeliveryStatus'],
       date: map['Date'],
     );
   }
 
   Future<int?> addOrUpdateService() async {
-  final db = await DBInitializer.instance.db;
-  final result = await db.transaction((txn) async {
-    try {
-      if (model.modelId == null) {
-        final newModelId = await Model(
-          modelName: model.modelName,
-        ).addOrUpdateModel(txn);
+    final db = await DBInitializer.instance.db;
+    final result = await db.transaction((txn) async {
+      try {
+        if (model.modelId == null) {
+          final newModelId = await Model(
+            modelName: model.modelName,
+          ).addOrUpdateModel(txn);
 
-        if (newModelId == null) {
-          throw Exception('Model insert failed');
+          if (newModelId == null) {
+            throw Exception('Model insert failed');
+          }
+
+          model.modelId = newModelId;
         }
 
-        model.modelId = newModelId;
-      }
-      
-      // 2️⃣ Brand
-      if (brand.brandId == null) {
-        final newBrandId = await Brand(
-          brandName: brand.brandName,
-        ).addOrUpdateBrand(txn);
+        // 2️⃣ Brand
+        if (brand.brandId == null) {
+          final newBrandId = await Brand(
+            brandName: brand.brandName,
+          ).addOrUpdateBrand(txn);
 
-        if (newBrandId == null) {
-          throw Exception('Brand insert failed');
+          if (newBrandId == null) {
+            throw Exception('Brand insert failed');
+          }
+
+          brand.brandId = newBrandId;
         }
 
-        brand.brandId = newBrandId;
-      }
+        // 3️⃣ Customer
+        if (customer.customerId == null) {
+          final newCustomerId = await Customer(
+            customerName: customer.customerName,
+            mobileNumber: customer.mobileNumber,
+          ).addorUpdateCustomer(txn);
 
-      // 3️⃣ Customer
-      if (customer.customerId == null) {
-        final newCustomerId = await Customer(
-          customerName: customer.customerName,
-          mobileNumber: customer.mobileNumber,
-        ).addorUpdateCustomer(txn);
+          if (newCustomerId == null) {
+            throw Exception('Customer insert failed');
+          }
 
-        if (newCustomerId == null) {
-          throw Exception('Customer insert failed');
+          customer.customerId = newCustomerId;
         }
+        // 4️⃣ Service
+        final result = serviceId == null
+            ? await txn.insert('ServiceTable', toMap())
+            : await txn.update(
+                'ServiceTable',
+                toMap(),
+                where: 'ServiceId = ?',
+                whereArgs: [serviceId],
+              );
 
-        customer.customerId = newCustomerId;
+        return result;
+      } catch (e) {
+        rethrow;
       }
-      // 4️⃣ Service
-      final result = serviceId == null
-          ? await txn.insert('ServiceTable', toMap())
-          : await txn.update(
-              'ServiceTable',
-              toMap(),
-              where: 'ServiceId = ?',
-              whereArgs: [serviceId],
-            );
+    });
+    return result;
+  }
 
-      return result;
-    } catch (e) {
-      rethrow;
-    }
-  });
-  return result;
-}
-
-
-   static Future<List<Map<String, dynamic>>> getAllServices() async {
+  static Future<List<Map<String, dynamic>>> getAllServices() async {
     Database db = await DBInitializer.instance.db;
-      List<Map<String, dynamic>> maps =
-          await db.rawQuery('''
+    List<Map<String, dynamic>> maps = await db.rawQuery('''
               SELECT S.*, C.CustomerName, B.BrandName, M.ModelName
               FROM ServiceTable S
               JOIN CustomerTable C ON S.CustomerID = C.CustomerId
               JOIN BrandTable B ON S.BrandId = B.BrandId
               JOIN ModelTable M ON S.ModelId = M.ModelId
           ''');
-      return maps ?? [];
+    return maps ?? [];
   }
 
-  static Future<Map<String , dynamic>> getServiceById(int? id) async {
+  static Future<Map<String, dynamic>> getServiceById(int? id) async {
     Database db = await DBInitializer.instance.db;
-      // with customerID join and brand and model
-      List<Map<String, dynamic>> maps = await db.rawQuery('''
+    // with customerID join and brand and model
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
         SELECT S.*, C.CustomerName, B.BrandName, M.ModelName , C.MobileNumber
         FROM ServiceTable S
         JOIN CustomerTable C ON S.CustomerID = C.CustomerId
         JOIN BrandTable B ON S.BrandId = B.BrandId
         JOIN ModelTable M ON S.ModelId = M.ModelId
         WHERE S.ServiceId = ?
-      ''', [id]);
+      ''',
+      [id],
+    );
     return maps.first;
   }
-
 }

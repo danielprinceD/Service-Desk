@@ -23,14 +23,15 @@ class _ServiceListPageState extends State<ServiceListPage> {
     });
   }
 
-  void onClick(BuildContext context, int? index) {
-    Navigator.push(
+  Future<void> onClick(BuildContext context, int? index) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
             ServiceEditPage(serviceId: _services[index!]['ServiceId']),
       ),
     );
+    initList();
   }
 
   @override
@@ -54,7 +55,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
                 itemBuilder: (context, index) {
                   final service = _services[index];
                   return ListTile(
-                    onTap: () => {onClick(context, index)},
+                    onTap: () async => {await onClick(context, index)},
                     minVerticalPadding: 10,
                     shape: Border.all(width: 2),
                     title: Text(
