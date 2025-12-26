@@ -41,9 +41,41 @@ class _TransactionListViewState extends State<TransactionListView> {
                 itemCount: _transactions.length,
                 itemBuilder: (context, index) {
                   final transaction = _transactions[index];
+                  int paymentType = transaction.paymentType.index;
                   return ListTile(
-                    title: Text(transaction.date),
-                    subtitle: Text(transaction.amount.toString()),
+                    title: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: paymentType == 0
+                            ? Colors.green[100]
+                            : Colors.red[100],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${paymentType == 0 ? 'Credit' : 'Debit'} - ${transaction.amount.toString()}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: paymentType == 0
+                              ? Colors.green[900]
+                              : Colors.red[900],
+                        ),
+                      ),
+                    ),
+                    subtitle: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        spacing: 7,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Note: ${transaction.note}"),
+                          Text("Date: ${transaction.date}"),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
