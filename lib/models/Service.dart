@@ -83,20 +83,16 @@ class Service {
 
           brand.brandId = newBrandId;
         }
-
         // 3️⃣ Customer
-        if (customer.customerId == null) {
-          final newCustomerId = await Customer(
-            customerName: customer.customerName,
-            mobileNumber: customer.mobileNumber,
-          ).addorUpdateCustomer(txn);
-
-          if (newCustomerId == null) {
-            throw Exception('Customer insert failed');
-          }
-
-          customer.customerId = newCustomerId;
+        final newCustomerId = await Customer(
+          customerName: customer.customerName,
+          mobileNumber: customer.mobileNumber,
+        ).addorUpdateCustomer(txn);
+        if (newCustomerId == null) {
+          throw Exception('Customer insert failed');
         }
+
+        customer.customerId = newCustomerId;
         // 4️⃣ Service
         final result = serviceId == null
             ? await txn.insert('ServiceTable', toMap())
@@ -118,7 +114,7 @@ class Service {
   static Future<List<Map<String, dynamic>>> getAllServices() async {
     Database db = await DBInitializer.instance.db;
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-              SELECT S.*, C.CustomerName, B.BrandName, M.ModelName
+              SELECT S.*, C.CustomerName, C.MobileNumber, B.BrandName, M.ModelName
               FROM ServiceTable S
               JOIN CustomerTable C ON S.CustomerID = C.CustomerId
               JOIN BrandTable B ON S.BrandId = B.BrandId

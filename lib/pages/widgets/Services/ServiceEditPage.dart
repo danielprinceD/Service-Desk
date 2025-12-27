@@ -3,13 +3,14 @@ import 'package:service_desk/models/Brand.dart';
 import 'package:service_desk/models/Customer.dart';
 import 'package:service_desk/models/Model.dart';
 import 'package:service_desk/models/Service.dart';
+import 'package:service_desk/utils/widgets/CustomSubmitButton.dart';
 import 'package:service_desk/utils/widgets/Service/ServiceFields.dart';
-import '../../../utils/widgets/Service/ServiceFields.dart';
 
 class ServiceEditPage extends StatefulWidget {
-  const ServiceEditPage({super.key, this.serviceId});
+  const ServiceEditPage({super.key, this.serviceId, this.customerId});
 
   final int? serviceId;
+  final int? customerId;
   static const String routeName = '/service/editpage';
 
   @override
@@ -41,7 +42,15 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
         service = Service.fromMap(serviceList);
       });
     }
-    print(service?.toMap());
+  }
+
+  Future<void> initCustomer() async {
+    Map<String, dynamic> customerMap = await Customer.getCustomerById(
+      widget.customerId,
+    );
+    setState(() {
+      service?.customer = Customer.fromMap(customerMap);
+    });
   }
 
   @override
@@ -59,7 +68,19 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
         date: DateTime.now().toString().split(' ')[0].replaceAll('-', '/'),
         totalAmount: 0.0,
       );
+      if (widget.customerId != null) {
+        initCustomer();
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    service = null;
+    _brands = null;
+    _models = null;
+    _customers = null;
   }
 
   @override
@@ -76,6 +97,7 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Service Added Successfully")),
         );
+        Navigator.pop(context);
       } catch (err) {
         if (!mounted) return;
 
@@ -94,16 +116,13 @@ class _ServiceEditPageState extends State<ServiceEditPage> {
       body: Form(
         key: formKey,
         child: service != null
-            ? ServiceFields.getServiceFields(
-                service,
-                widget,
-                _brands,
-                _models,
-                _customers,
-                ElevatedButton(
-                  onPressed: () => onSubmit(context),
-                  child: Container(child: Text('Submit')),
-                ),
+            ? ServiceFields(
+                service: service,
+                serviceEditPage: widget,
+                brands: _brands,
+                models: _models,
+                customers: _customers,
+                button: CustomSubmitButton(onPressed: () => onSubmit(context)),
               )
             : Text("No Data Found"),
       ),

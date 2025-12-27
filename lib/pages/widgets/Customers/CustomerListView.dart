@@ -34,8 +34,9 @@ class _CustomerListViewState extends State<CustomerListView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            CustomerEditPage(customerId: _customers[index!]['CustomerId']),
+        builder: (context) => CustomerEditPage(
+          customerId: _searchCustomers[index!]['CustomerId'],
+        ),
       ),
     );
   }

@@ -43,7 +43,7 @@ class Customer {
 
   static Future<List> getAllCustomer() async {
     Database db = await DBInitializer.instance.db;
-    List models = await db.query('CustomerTable');
+    List models = await db.rawQuery('SELECT * FROM CustomerTable');
     return models ?? [];
   }
 

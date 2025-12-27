@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomDropDown extends StatefulWidget {
-  const CustomDropDown({super.key , required this.child});
+  const CustomDropDown({super.key, required this.child});
   final Widget child;
 
   @override
@@ -12,14 +12,10 @@ class _CustomDropDownState extends State<CustomDropDown> {
   @override
   Widget build(BuildContext context) {
     return Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              width: double.infinity,
-              child: widget.child,
-            );
+      padding: EdgeInsets.only(top: 11, bottom: 11),
+      alignment: Alignment.centerLeft,
+      width: double.infinity,
+      child: widget.child,
+    );
   }
 }
