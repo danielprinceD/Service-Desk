@@ -57,7 +57,9 @@ class _ServiceFieldsState extends State<ServiceFields> {
 
             DropdownSearch<Map<String, dynamic>>(
               mode: Mode.form,
-              validator: (value) => value == null || value.isEmpty == true
+              validator: (value) =>
+                  widget.service?.brand.brandName == null ||
+                      value?.isEmpty == true
                   ? 'Brand is required'
                   : null,
               items: (filter, cs) =>
@@ -124,7 +126,9 @@ class _ServiceFieldsState extends State<ServiceFields> {
 
             DropdownSearch<Map<String, dynamic>>(
               mode: Mode.form,
-              validator: (value) => value == null || value.isEmpty == true
+              validator: (value) =>
+                  widget.service?.brand.brandName == null ||
+                      value?.isEmpty == true
                   ? 'Model is required'
                   : null,
               items: (filter, cs) =>

@@ -94,6 +94,8 @@ class Service {
           throw Exception('Customer insert failed');
         }
 
+        customer.customerId = newCustomerId;
+
         // 4️⃣ Service
         final result = serviceId == null
             ? await txn.insert('ServiceTable', toMap())
@@ -121,7 +123,7 @@ class Service {
               JOIN BrandTable B ON S.BrandId = B.BrandId
               JOIN ModelTable M ON S.ModelId = M.ModelId
           ''');
-    return maps ?? [];
+    return maps;
   }
 
   static Future<Map<String, dynamic>> getServiceById(int? id) async {

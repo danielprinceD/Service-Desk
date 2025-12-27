@@ -21,7 +21,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
     List serviceList = await Service.Service.getAllServices();
     setState(() {
       _services = serviceList;
-      _searchServices = serviceList;
+      _searchServices = _services;
     });
   }
 
