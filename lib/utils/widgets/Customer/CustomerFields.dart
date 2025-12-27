@@ -4,13 +4,103 @@ import 'package:service_desk/models/Service.dart';
 import 'package:service_desk/pages/widgets/Services/ServiceEditPage.dart';
 import 'package:service_desk/pages/widgets/Transactions/TransactionEditPage.dart';
 import 'package:service_desk/pages/widgets/Transactions/TransactionListView.dart';
+import 'package:service_desk/utils/widgets/CustomBottomSheet.dart';
+import 'package:service_desk/utils/widgets/CustomSearchBar.dart';
 
-class CustomerFields {
-  static Widget getCustomerFields(
-    Customer customer,
-    List<Service> services,
-    BuildContext context,
-  ) {
+class CustomerFields extends StatefulWidget {
+  CustomerFields({
+    super.key,
+    required this.customer,
+    required this.services,
+    required this.context,
+    required this.initCustomer,
+  });
+
+  final Customer customer;
+  final List<Service> services;
+  final BuildContext context;
+  final Function() initCustomer;
+
+  @override
+  _CustomerFieldsState createState() => _CustomerFieldsState();
+}
+
+class _CustomerFieldsState extends State<CustomerFields> {
+  Future<void> onPressAddService(BuildContext context, int customerID) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ServiceEditPage(serviceId: null, customerId: customerID),
+      ),
+    );
+    return result;
+  }
+
+  List<Service> _searchServices = [];
+
+  void searchService(String value) {
+    setState(() {
+      _searchServices = widget.services
+          .where(
+            (service) =>
+                service.IMEINumber.toLowerCase().contains(value.toLowerCase()),
+          )
+          .toList();
+    });
+  }
+
+  Future<void> showDeleteDialog(BuildContext context, int serviceId) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => CustomBottomSheet(
+        title: 'Delete Service',
+        alertMesssage: 'Are you sure you want to delete this service?',
+        leftButtonText: 'Cancel',
+        rightButtonText: 'Delete',
+        leftButtonOnPressed: () {
+          Navigator.pop(context);
+        },
+        rightButtonOnPressed: () async {
+          int? result = await Service.deleteService(serviceId);
+          if (result == null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Service delete failed')));
+            initServicesbyRemove(serviceId);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Service deleted successfully')),
+            );
+          }
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  void initServices() {
+    setState(() {
+      _searchServices = widget.services;
+    });
+  }
+
+  void initServicesbyRemove(int serviceId) {
+    setState(() {
+      _searchServices = _searchServices
+          .where((service) => service.serviceId != serviceId)
+          .toList();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initServices();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: SingleChildScrollView(
@@ -28,8 +118,8 @@ class CustomerFields {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Icon(Icons.person, size: 70),
-                  Text('${customer.customerName}'),
-                  Text('(+91) ${customer.mobileNumber}'),
+                  Text('${widget.customer.customerName}'),
+                  Text('(+91) ${widget.customer.mobileNumber}'),
                 ],
               ),
               Column(
@@ -42,7 +132,7 @@ class CustomerFields {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
-                        'Number of Services: ${services.length}',
+                        'Number of Services: ${widget.services.length}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -60,27 +150,27 @@ class CustomerFields {
                             backgroundColor: Colors.green,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            await onPressAddService(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => ServiceEditPage(
-                                  serviceId: null,
-                                  customerId: customer.customerId,
-                                ),
-                              ),
+                              widget.customer.customerId!,
                             );
+                            widget.initCustomer();
                           },
                           icon: Icon(Icons.add),
                         ),
                       ),
                     ],
                   ),
-                  ...services
+                  CustomSearchBar(
+                    onChanged: (value) => searchService(value),
+                    hintText: 'Search Service with IMEI Number',
+                  ),
+                  ..._searchServices
                       .map(
                         (service) => ListTile(
                           title: Container(
-                            width: double.maxFinite,
+                            width: double.infinity,
                             padding: EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               color: Colors.grey[200],
@@ -91,8 +181,35 @@ class CustomerFields {
                               spacing: 13,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Brand: ${service.brand.brandName}'),
-                                Text('Model: ${service.model.modelName}'),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${service.brand.brandName} ${service.model.modelName}',
+                                      ),
+                                    ),
+                                    Container(
+                                      alignment: Alignment.centerRight,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          await showDeleteDialog(
+                                            context,
+                                            service.serviceId!,
+                                          );
+                                        },
+                                        icon: Icon(
+                                          Icons.delete,
+                                          size: 20,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
                                 Text('IMEI Number: ${service.IMEINumber}'),
                                 Text('Total Amount: ${service.totalAmount}'),
                                 Text(

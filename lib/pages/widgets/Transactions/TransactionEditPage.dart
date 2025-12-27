@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:service_desk/models/Transaction.dart';
 
 class TransactionEditPage extends StatefulWidget {
@@ -46,6 +47,10 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   labelText: 'Amount',
                   border: const OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                ],
                 onChanged: (value) =>
                     transaction?.amount = double.tryParse(value) ?? 0.0,
                 initialValue: transaction?.amount == 0

@@ -38,6 +38,9 @@ class Customer {
             where: 'CustomerId = ?',
             whereArgs: [customerId],
           );
+    if (customerId != null) {
+      return customerId;
+    }
     return newCustomerID;
   }
 
@@ -49,10 +52,9 @@ class Customer {
 
   static Future<Map<String, dynamic>> getCustomerById(int? id) async {
     Database db = await DBInitializer.instance.db;
-    List<Map<String, dynamic>> maps = await db.query(
-      'CustomerTable',
-      where: 'CustomerId = ?',
-      whereArgs: [id],
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''SELECT CustomerId, CustomerName, MobileNumber FROM CustomerTable WHERE CustomerId = ?''',
+      [id],
     );
     return maps.first;
   }

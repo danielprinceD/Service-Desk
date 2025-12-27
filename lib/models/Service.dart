@@ -85,14 +85,15 @@ class Service {
         }
         // 3️⃣ Customer
         final newCustomerId = await Customer(
+          customerId: customer.customerId,
           customerName: customer.customerName,
           mobileNumber: customer.mobileNumber,
         ).addorUpdateCustomer(txn);
+
         if (newCustomerId == null) {
           throw Exception('Customer insert failed');
         }
 
-        customer.customerId = newCustomerId;
         // 4️⃣ Service
         final result = serviceId == null
             ? await txn.insert('ServiceTable', toMap())
@@ -138,5 +139,19 @@ class Service {
       [id],
     );
     return maps.first;
+  }
+
+  static Future<int?> deleteService(int? id) async {
+    Database db = await DBInitializer.instance.db;
+    try {
+      int result = await db.delete(
+        'ServiceTable',
+        where: 'ServiceId = ?',
+        whereArgs: [id],
+      );
+      return result;
+    } catch (e) {
+      throw Exception('Service delete failed');
+    }
   }
 }

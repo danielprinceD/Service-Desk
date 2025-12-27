@@ -54,10 +54,11 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: CustomerFields.getCustomerFields(
-                  customer!,
-                  _services,
-                  context,
+                child: CustomerFields(
+                  customer: customer!,
+                  services: _services,
+                  context: context,
+                  initCustomer: initCustomer,
                 ),
               )
             : Text("No Data Found"),

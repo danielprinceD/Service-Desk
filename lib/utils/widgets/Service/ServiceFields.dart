@@ -57,8 +57,9 @@ class _ServiceFieldsState extends State<ServiceFields> {
 
             DropdownSearch<Map<String, dynamic>>(
               mode: Mode.form,
-              validator: (value) =>
-                  value?.isEmpty == true ? 'Brand is required' : null,
+              validator: (value) => value == null || value.isEmpty == true
+                  ? 'Brand is required'
+                  : null,
               items: (filter, cs) =>
                   widget.brands
                       ?.map(
@@ -123,8 +124,9 @@ class _ServiceFieldsState extends State<ServiceFields> {
 
             DropdownSearch<Map<String, dynamic>>(
               mode: Mode.form,
-              validator: (value) =>
-                  value?.isEmpty == true ? 'Model is required' : null,
+              validator: (value) => value == null || value.isEmpty == true
+                  ? 'Model is required'
+                  : null,
               items: (filter, cs) =>
                   widget.models
                       ?.map(
@@ -190,7 +192,10 @@ class _ServiceFieldsState extends State<ServiceFields> {
             DropdownSearch<Map<String, dynamic>>(
               mode: Mode.form,
               validator: (value) =>
-                  value?.isEmpty == true ? 'Customer is required' : null,
+                  widget.service?.customer.customerName == null ||
+                      value?.isEmpty == true
+                  ? 'Customer is required'
+                  : null,
               items: (filter, cs) =>
                   widget.customers
                       ?.map(

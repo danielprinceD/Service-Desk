@@ -30,10 +30,9 @@ class _ServiceListPageState extends State<ServiceListPage> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ServiceEditPage(serviceId: _services[index!]['ServiceId']),
+            ServiceEditPage(serviceId: _searchServices[index!]['ServiceId']),
       ),
     );
-    initList();
     return result;
   }
 
@@ -75,7 +74,9 @@ class _ServiceListPageState extends State<ServiceListPage> {
                   final service = _searchServices[index];
                   return ListTile(
                     key: ValueKey(index),
-                    onTap: () async => {await onClick(context, index)},
+                    onTap: () async {
+                      await onClick(context, index);
+                    },
                     contentPadding: EdgeInsets.all(10),
                     leading: Container(
                       width: 40,
